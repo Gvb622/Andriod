@@ -71,6 +71,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         post1.put("Name", productName);
         post1.put("Barcode", Barcode);
         mDatabase.push().setValue(post1);
-
+//
     }
 }

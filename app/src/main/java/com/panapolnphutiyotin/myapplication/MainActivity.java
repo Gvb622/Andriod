@@ -13,10 +13,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -30,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private FirebaseAuth firebaseAuth;
 
+    private DatabaseReference mDatabase;
+
 
 
     @Override
@@ -38,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
 
         if(firebaseAuth.getCurrentUser() != null){
             finish();
@@ -59,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void registerUser(){
-        String email = editTextMail.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
+        final String email = editTextMail.getText().toString().trim();
+        final String password = editTextPassword.getText().toString().trim();
 
         if(TextUtils.isEmpty(email)){
             Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
@@ -81,6 +91,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
 
+                                String user_id = firebaseAuth.getCurrentUser().getUid();
+                                DatabaseReference current_user_db = mDatabase.child(user_id);
+                                current_user_db.child("email").setValue(email);
+                                progressDialog.dismiss();
                                 finish();
                                 startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
 
@@ -90,8 +104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 });
-
-
     }
 
     @Override

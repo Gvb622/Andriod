@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,6 +39,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private DatabaseReference mDatabase;
 
+    private Firebase ref;
+
+
+
 
 
     @Override
@@ -46,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        ref.setAndroidContext(this);
+
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
 
@@ -68,16 +75,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void registerUser(){
+    private void registerUser() {
         final String email = editTextMail.getText().toString().trim();
         final String password = editTextPassword.getText().toString().trim();
 
-        if(TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -85,7 +92,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog.setMessage("Registering User...");
         progressDialog.show();
 
-        firebaseAuth.createUserWithEmailAndPassword(email,password)
+        ref = new Firebase("https://examplelogin-a0b4b.firebaseio.com");
+        ref.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
+            @Override
+            public void onSuccess(Map<String, Object> stringObjectMap) {
+                progressDialog.dismiss();
+                System.out.println("Successfully created user account with uid: " + stringObjectMap.get("uid"));
+            }
+
+            @Override
+            public void onError(FirebaseError firebaseError) {
+                System.out.println("Eror");
+            }
+        });
+    }
+
+
+        /*firebaseAuth.createUserWithEmailAndPassword(email,password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -105,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
     }
+    */
 
     @Override
     public void onClick(View v) {

@@ -8,8 +8,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.firebase.client.AuthData;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -19,6 +26,7 @@ import java.util.Map;
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth firebaseAuth;
+    private Firebase ref;
     private DatabaseReference mDatabase;
     private TextView textViewUserEmail;
     private Button buttonLogout;
@@ -34,17 +42,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("items");
-
-        if(firebaseAuth.getCurrentUser() == null){
-            finish();
-            startActivity(new Intent(this, LoginActivity.class));
+        if (firebaseAuth.getCurrentUser() == null) {
+           // finish();
+           // startActivity(new Intent(this, LoginActivity.class));
         }
+
 
         buttonAdditem = (Button) findViewById(R.id.buttonAdditem);
         editTextBarcode = (EditText) findViewById(R.id.editTextProductName);
         editTextProductName = (EditText) findViewById(R.id.editTextBarcode);
-        textViewUserEmail = (TextView)findViewById(R.id.textViewUserEmail);
-        textViewUserEmail.setText("Welcome "+ user.getEmail());
+        textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
+        textViewUserEmail.setText("Welcome " + user.getEmail());
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
 
         buttonLogout.setOnClickListener(this);
@@ -53,24 +61,47 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        if(v == buttonAdditem ){
+        if (v == buttonAdditem) {
             addItem();
+            check();
         }
-        if(v == buttonLogout) {
-            firebaseAuth.signOut();
+        if (v == buttonLogout) {
+            /*firebaseAuth.signOut();
             finish();
             startActivity(new Intent(this, LoginActivity.class));
+            */
+            startActivity(new Intent(this, ShowList.class));
         }
     }
 
-    public void addItem(){
+    public void addItem() {
         String productName = editTextProductName.getText().toString().trim();
         String Barcode = editTextBarcode.getText().toString().trim();
 
         Map<String, String> post1 = new HashMap<String, String>();
         post1.put("Name", productName);
         post1.put("Barcode", Barcode);
+
         mDatabase.push().setValue(post1);
-//
+    }
+
+    public void check() {
+
+        mDatabase.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    item post = postSnapshot.getValue(item.class);
+                    System.out.println(post.getBarcode() + "  " + post.getName());
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
     }
 }

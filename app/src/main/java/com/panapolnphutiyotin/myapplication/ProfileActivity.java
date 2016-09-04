@@ -49,8 +49,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         buttonAdditem = (Button) findViewById(R.id.buttonAdditem);
-        editTextBarcode = (EditText) findViewById(R.id.editTextProductName);
-        editTextProductName = (EditText) findViewById(R.id.editTextBarcode);
+
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
         textViewUserEmail.setText("Welcome " + user.getEmail());
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
@@ -62,15 +61,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if (v == buttonAdditem) {
-            addItem();
-            check();
+            startActivity(new Intent(this, ShowList.class));
         }
         if (v == buttonLogout) {
             /*firebaseAuth.signOut();
             finish();
             startActivity(new Intent(this, LoginActivity.class));
             */
-            startActivity(new Intent(this, ShowList.class));
+            startActivity(new Intent(this, AddItemActivity.class));
         }
     }
 

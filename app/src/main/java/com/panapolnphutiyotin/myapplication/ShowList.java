@@ -1,12 +1,21 @@
 package com.panapolnphutiyotin.myapplication;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.InputType;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,15 +28,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.squareup.picasso.Picasso;
 
 public class ShowList extends AppCompatActivity {
 
     private RecyclerView mList;
+    private ImageButton Additem;
     private DatabaseReference mDatabase;
     private FirebaseAuth firebaseAuth;
     private ImageView imageView;
     private item i2;
+    private boolean additem ;
 
 
     @Override
@@ -35,8 +47,11 @@ public class ShowList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_list);
 
+        Additem = (ImageButton) findViewById(R.id.Additem);
+
         imageView = (ImageView) findViewById(R.id.imageItem);
         firebaseAuth = FirebaseAuth.getInstance();
+        additem = false;
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
@@ -45,6 +60,15 @@ public class ShowList extends AppCompatActivity {
         mList = (RecyclerView) findViewById(R.id.item_list);
         mList.setHasFixedSize(true);
         mList.setLayoutManager(new LinearLayoutManager(this));
+        mList.addItemDecoration(new SimpleListDividerDecorator(ContextCompat.getDrawable(this, R.drawable.list_divider), true));
+
+        Additem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ShowList.this, AddItemActivity.class));
+            }
+        });
+
     }
     @Override
     protected void onStart() {
@@ -63,8 +87,6 @@ public class ShowList extends AppCompatActivity {
                 viewHolder.setVolumn(model.getUnit());
                 viewHolder.setImage(getApplicationContext(), model.getImage());
             }
-
-
         };
 
         mList.addOnItemTouchListener(
@@ -72,23 +94,63 @@ public class ShowList extends AppCompatActivity {
                     @Override public void onItemClick(View view, int position) {
 
                         final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
-                        s.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                item item = dataSnapshot.getValue(item.class);
-                                int i = item.getNumber();
-                                i = i - 10;
-                                s.child("Number").setValue(i);
-                            }
+                            s.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    item item = dataSnapshot.getValue(item.class);
+                                    int i = Integer.parseInt(item.getUnit());
+                                    i = i - 1;
+                                    s.child("Unit").setValue(Integer.toString(i));
 
+                                    }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+
+                    }
+                    @Override public void onLongItemClick(View view, int position) {
+                        final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
+                        builder.setTitle("How much decrease ?");
+                        final EditText input = new EditText(ShowList.this);
+                        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                        input.setGravity(Gravity.CENTER);
+                        builder.setView(input);
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                            public void onClick(DialogInterface dialog, int which) {
+                                final String m = input.getText().toString();
+                                final int j = Integer.parseInt(m);
+                                s.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        item item = dataSnapshot.getValue(item.class);
+                                        int i = Integer.parseInt(item.getUnit());
+                                        i = i - j;
+                                        s.child("Unit").setValue(Integer.toString(i));
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
 
                             }
                         });
-                    }
-                    @Override public void onLongItemClick(View view, int position) {
-                        // do whatever
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        builder.show();
+
                     }
                 })
         );

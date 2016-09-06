@@ -105,6 +105,7 @@ public class AddItemActivity extends AppCompatActivity {
                             newItem.child("Image").setValue(downloadUrl.toString());
 
                             mProgress.dismiss();
+                            finish();
 
                         }
                     });
@@ -124,6 +125,7 @@ public class AddItemActivity extends AppCompatActivity {
                     newItem.child("Image").setValue("https://firebasestorage.googleapis.com/v0/b/examplelogin-a0b4b.appspot.com/o/Item_Image%2Fimage%3A58?alt=media&token=3cdc2779-fa01-436e-93b1-4a8c836ab422");
 
                     mProgress.dismiss();
+                    finish();
                 }
             }
         });

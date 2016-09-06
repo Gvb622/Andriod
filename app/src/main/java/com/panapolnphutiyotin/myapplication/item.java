@@ -8,6 +8,10 @@ public class item {
     private String Name;
     private String Image;
 
+
+    private String Unit;
+    private int Number;
+
     public String getUnit() {
         return Unit;
     }
@@ -15,11 +19,6 @@ public class item {
     public void setUnit(String unit) {
         Unit = unit;
     }
-
-    private String Unit;
-    private int Number;
-
-
 
     public item() {
 

@@ -19,6 +19,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseAuth firebaseAuth;
     private Firebase ref;
     private DatabaseReference mDatabase;
+    private DatabaseReference sDatabase;
     private TextView textViewUserEmail;
     private Button buttonLogout;
     private Button buttonAdditem;
@@ -42,6 +44,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("items");
+
         if (firebaseAuth.getCurrentUser() == null) {
            // finish();
            // startActivity(new Intent(this, LoginActivity.class));
@@ -69,6 +72,23 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             startActivity(new Intent(this, LoginActivity.class));
             */
             startActivity(new Intent(this, AddItemActivity.class));
+
+            /*sDatabase = FirebaseDatabase.getInstance().getReference().child("system").child("items");
+            Query query = sDatabase.orderByChild("Barcode").equalTo("123");
+            query.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                    for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        System.out.println(postSnapshot.getKey());
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+*/
         }
     }
 

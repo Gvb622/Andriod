@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:weightSum="1">
+    android:layout_height="72dp"
+    android:weightSum="1"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground"
+    >
 
     <ImageView
         android:id="@+id/imageItem"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.25"
         android:src="@mipmap/ic_launcher"/>
     <TextView
+
         android:gravity="center"
         android:id="@+id/nameItem"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.3" />
     <TextView
+
         android:gravity="center"
         android:id="@+id/volumnItem"
         android:layout_weight="0.3"
         android:layout_width="0dp"
-        android:layout_height="100dp" />
+        android:layout_height="match_parent" />
     <ImageView
         android:id="@+id/sign"
         android:background="@color/red"
         android:layout_weight="0.15"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="match_parent"
         android:src="@mipmap/ic_launcher"/>
 
 </LinearLayout>

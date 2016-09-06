@@ -58,7 +58,8 @@
                 android:gravity="center"
                 android:layout_margin="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:inputType="number"/>
 
             <EditText
                 android:id="@+id/addPriceEdit"
@@ -66,7 +67,8 @@
                 android:gravity="center"
                 android:layout_margin="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:inputType="number"/>
 
             <EditText
                 android:id="@+id/addMadeinEdit"

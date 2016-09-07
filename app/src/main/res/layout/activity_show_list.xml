@@ -71,22 +71,30 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
+            android:background= "@color/buttonColor"
             android:src="@mipmap/ic_add_black_24dp"/>
         <ImageButton
+            android:id="@+id/IncreaseItem"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
-            android:src="@mipmap/ic_launcher"/>
+            android:background= "@color/buttonColor"
+            android:src="@mipmap/ic_arrow_upward_black_24dp"
+            />
         <ImageButton
+            android:id="@+id/DecreaseItem"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
-            android:src="@mipmap/ic_launcher"/>
+            android:background= "@color/buttonColor"
+            android:src="@mipmap/ic_arrow_downward_black_24dp"/>
         <ImageButton
+            android:id="@+id/RemoveItem"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
-            android:src="@mipmap/ic_launcher"/>
+            android:background="@color/buttonColor"
+            android:src="@mipmap/ic_clear_black_24dp"/>
 
     </LinearLayout>
 

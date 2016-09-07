@@ -4,21 +4,14 @@ package com.panapolnphutiyotin.myapplication;
  * Created by panapolnphutiyotin on 9/3/16 AD.
  */
 public class item {
+
     private String Barcode;
     private String Name;
     private String Image;
-
-
     private String Unit;
-    private int Number;
-
-    public String getUnit() {
-        return Unit;
-    }
-
-    public void setUnit(String unit) {
-        Unit = unit;
-    }
+    private String Madein;
+    private String Price;
+    private String Type;
 
     public item() {
 
@@ -47,11 +40,38 @@ public class item {
         Image = image;
     }
 
-    public int getNumber() {
-        return Number;
+    public String getMadein() {
+        return Madein;
     }
 
-    public void setNumber(int number) {
-        Number = number;
+    public void setMadein(String madein) {
+        Madein = madein;
     }
+
+    public String getPrice() {
+        return Price;
+    }
+
+    public void setPrice(String price) {
+        Price = price;
+    }
+
+    public String getType() {
+        return Type;
+    }
+
+    public void setType(String type) {
+        Type = type;
+    }
+
+    public String getUnit() {
+        return Unit;
+    }
+
+    public void setUnit(String unit) {
+        Unit = unit;
+    }
+
+
+
 }

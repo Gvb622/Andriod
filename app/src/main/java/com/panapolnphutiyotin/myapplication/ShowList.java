@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -31,15 +32,25 @@ import com.google.firebase.database.ValueEventListener;
 import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 public class ShowList extends AppCompatActivity {
 
     private RecyclerView mList;
     private ImageButton Additem;
+    private ImageButton Increaseitem;
+    private ImageButton Decreaseitem;
+    private ImageButton Removeitem;
+
+
     private DatabaseReference mDatabase;
     private FirebaseAuth firebaseAuth;
     private ImageView imageView;
     private item i2;
     private boolean additem ;
+    private boolean decreaseitem;
+    private boolean removeitem;
+
 
 
     @Override
@@ -48,10 +59,17 @@ public class ShowList extends AppCompatActivity {
         setContentView(R.layout.activity_show_list);
 
         Additem = (ImageButton) findViewById(R.id.Additem);
+        Increaseitem = (ImageButton) findViewById(R.id.IncreaseItem);
+        Decreaseitem = (ImageButton) findViewById(R.id.DecreaseItem);
+        Removeitem = (ImageButton) findViewById(R.id.RemoveItem);
+
+
 
         imageView = (ImageView) findViewById(R.id.imageItem);
         firebaseAuth = FirebaseAuth.getInstance();
         additem = false;
+        decreaseitem = false;
+        removeitem = false;
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
@@ -61,14 +79,78 @@ public class ShowList extends AppCompatActivity {
         mList.setHasFixedSize(true);
         mList.setLayoutManager(new LinearLayoutManager(this));
         mList.addItemDecoration(new SimpleListDividerDecorator(ContextCompat.getDrawable(this, R.drawable.list_divider), true));
+        //mList.setItemAnimator(new DefaultItemAnimator());
 
+        Removeitem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean r = !removeitem;
+                removeitem = r;
+                if(r == true){
+                    Removeitem.setImageResource(R.mipmap.ic_clear_white_24dp);
+                    additem = false;
+                    Increaseitem.setImageResource(R.mipmap.ic_arrow_upward_black_24dp);
+                    decreaseitem = false;
+                    Decreaseitem.setImageResource(R.mipmap.ic_arrow_downward_black_24dp);
+
+                }else{
+                    Removeitem.setImageResource(R.mipmap.ic_clear_black_24dp);
+                }
+            }
+        });
         Additem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                removeitem = false;
+                Removeitem.setImageResource(R.mipmap.ic_clear_black_24dp);
+                additem = false;
+                Increaseitem.setImageResource(R.mipmap.ic_arrow_upward_black_24dp);
+                decreaseitem = false;
+                Decreaseitem.setImageResource(R.mipmap.ic_arrow_downward_black_24dp);
+
                 startActivity(new Intent(ShowList.this, AddItemActivity.class));
             }
         });
 
+        Decreaseitem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean a = !decreaseitem;
+                decreaseitem = a;
+                if(a == true){
+                    Decreaseitem.setImageResource(R.mipmap.ic_arrow_downward_white_24dp);
+                    additem = false;
+                    Increaseitem.setImageResource(R.mipmap.ic_arrow_upward_black_24dp);
+                    removeitem = false;
+                    Removeitem.setImageResource(R.mipmap.ic_clear_black_24dp);
+
+                }else{
+                    Decreaseitem.setImageResource(R.mipmap.ic_arrow_downward_black_24dp);
+                }
+
+            }
+        });
+
+        Increaseitem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean b = !additem ;
+                additem = b;
+
+                if(b == true){
+
+                    Increaseitem.setImageResource(R.mipmap.ic_arrow_upward_white_24dp);
+                    decreaseitem = false;
+                    Decreaseitem.setImageResource(R.mipmap.ic_arrow_downward_black_24dp);
+                    removeitem = false;
+                    Removeitem.setImageResource(R.mipmap.ic_clear_black_24dp);
+
+                }else{
+                    Increaseitem.setImageResource(R.mipmap.ic_arrow_upward_black_24dp);
+                }
+
+            }
+        });
     }
     @Override
     protected void onStart() {
@@ -87,13 +169,18 @@ public class ShowList extends AppCompatActivity {
                 viewHolder.setVolumn(model.getUnit());
                 viewHolder.setImage(getApplicationContext(), model.getImage());
             }
+
+
         };
 
         mList.addOnItemTouchListener(
                 new RecyclerItemClickListener(getApplicationContext(), mList ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
 
-                        final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
+                            final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
+
+                        if(decreaseitem == true) {
+
                             s.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -102,7 +189,7 @@ public class ShowList extends AppCompatActivity {
                                     i = i - 1;
                                     s.child("Unit").setValue(Integer.toString(i));
 
-                                    }
+                                }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
@@ -110,49 +197,143 @@ public class ShowList extends AppCompatActivity {
                                 }
                             });
 
+                        }else  if (additem == true){
 
+                            s.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    item item = dataSnapshot.getValue(item.class);
+                                    int i = Integer.parseInt(item.getUnit());
+                                    i = i + 1;
+                                    s.child("Unit").setValue(Integer.toString(i));
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        }else if (removeitem == true){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
+                            builder.setTitle("Are you sure ?");
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    s.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            s.removeValue();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            builder.show();
+                        }else{
+
+                            Intent i = new Intent(ShowList.this, ShowInformationItem.class);
+                            i.putExtra("key",s.getKey());
+                            startActivity(i);
+
+                        }
 
                     }
                     @Override public void onLongItemClick(View view, int position) {
                         final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
-                        builder.setTitle("How much decrease ?");
-                        final EditText input = new EditText(ShowList.this);
-                        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                        input.setGravity(Gravity.CENTER);
-                        builder.setView(input);
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                final String m = input.getText().toString();
-                                final int j = Integer.parseInt(m);
-                                s.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        item item = dataSnapshot.getValue(item.class);
-                                        int i = Integer.parseInt(item.getUnit());
-                                        i = i - j;
-                                        s.child("Unit").setValue(Integer.toString(i));
-                                    }
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                        if (decreaseitem == true) {
 
-                                    }
-                                });
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
+                            builder.setTitle("How much decrease ?");
+                            final EditText input = new EditText(ShowList.this);
+                            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                            input.setGravity(Gravity.CENTER);
+                            builder.setView(input);
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    final String m = input.getText().toString();
+                                    final int j = Integer.parseInt(m);
+                                    s.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            item item = dataSnapshot.getValue(item.class);
+                                            int i = Integer.parseInt(item.getUnit());
+                                            i = i - j;
+                                            s.child("Unit").setValue(Integer.toString(i));
+                                        }
 
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
-                        builder.show();
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
+                                        }
+                                    });
+
+                                }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            builder.show();
+
+                        }else if(additem == true ){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
+                            builder.setTitle("How much Increase ?");
+                            final EditText input = new EditText(ShowList.this);
+                            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                            input.setGravity(Gravity.CENTER);
+                            builder.setView(input);
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    final String m = input.getText().toString();
+                                    final int j = Integer.parseInt(m);
+                                    s.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            item item = dataSnapshot.getValue(item.class);
+                                            int i = Integer.parseInt(item.getUnit());
+                                            i = i + j;
+                                            s.child("Unit").setValue(Integer.toString(i));
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                                }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            builder.show();
+                        }
                     }
+
+
                 })
+
+
         );
 
         mList.setAdapter(firebaseRecyclerAdapter);
@@ -177,7 +358,7 @@ public class ShowList extends AppCompatActivity {
         }
         public void setImage(Context ctx , String image){
             ImageView imageView = (ImageView) mView.findViewById(R.id.imageItem);
-            Picasso.with(ctx).load(image).resize(200,200).placeholder(R.mipmap.ic_launcher).into(imageView);
+            Picasso.with(ctx).load(image).fit().placeholder(R.mipmap.ic_launcher).into(imageView);
 
         }
 

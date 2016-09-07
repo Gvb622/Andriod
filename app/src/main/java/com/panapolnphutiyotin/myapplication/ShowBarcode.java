@@ -24,9 +24,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-public class ShowInformationItem extends AppCompatActivity {
+public class ShowBarcode extends AppCompatActivity {
 
-    private ImageButton addImageButton6;
+    private ImageButton addImageButton2;
     private EditText Barcode2;
     private EditText Name2;
     private EditText Type2;
@@ -46,39 +46,38 @@ public class ShowInformationItem extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_information_item);
+        setContentView(R.layout.activity_show_barcode);
 
         Bundle extras = getIntent().getExtras();
         String value = extras.getString("key");
-        String value2 = extras.getString("mode");
 
-        addImageButton6 = (ImageButton) findViewById(R.id.addImageButton2);
-        Barcode2 = (EditText) findViewById(R.id.addBarcodeEdit2);
-        Name2 = (EditText) findViewById(R.id.addNameEdit2);
-        Type2 = (EditText) findViewById(R.id.addTypeEdit2);
-        Unit2 = (EditText) findViewById(R.id.addUnitEdit2);
-        Price2 = (EditText) findViewById(R.id.addPriceEdit2);
-        Madein2 = (EditText) findViewById(R.id.addMadeinEdit2);
-        Submit2 = (Button) findViewById(R.id.addSubmitButton2);
-        Submit3 = (Button) findViewById(R.id.addSubmitButton3);
+        addImageButton2 = (ImageButton) findViewById(R.id.addImageButton6);
+        Barcode2 = (EditText) findViewById(R.id.addBarcodeEdit3);
+        Name2 = (EditText) findViewById(R.id.addNameEdit3);
+        Type2 = (EditText) findViewById(R.id.addTypeEdit3);
+        Unit2 = (EditText) findViewById(R.id.addUnitEdit3);
+        Price2 = (EditText) findViewById(R.id.addPriceEdit3);
+        Madein2 = (EditText) findViewById(R.id.addMadeinEdit3);
+        Submit2 = (Button) findViewById(R.id.addSubmitButton4);
+        Submit3 = (Button) findViewById(R.id.addSubmitButton5);
 
         final ProgressDialog mProgress = new ProgressDialog(this);
 
 
         mStorage = FirebaseStorage.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        System.out.println(value);
 
-        System.out.println(value2);
-
-            mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("items").child(value);
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("system").child("items").child(value);
 
 
         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println(dataSnapshot.getChildrenCount());
                 item i2 = dataSnapshot.getValue(item.class);
-                Picasso.with(ShowInformationItem.this).load(i2.getImage()).fit().placeholder(R.mipmap.ic_launcher).into(addImageButton6);
+                Picasso.with(ShowBarcode.this).load(i2.getImage()).fit().placeholder(R.mipmap.ic_launcher).into(addImageButton2);
                 Barcode2.setText(i2.getBarcode());
                 Name2.setText(i2.getName());
                 Type2.setText(i2.getType());
@@ -94,12 +93,14 @@ public class ShowInformationItem extends AppCompatActivity {
             }
         });
 
-        addImageButton6.setOnClickListener(new View.OnClickListener() {
+        addImageButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GALLERY_REQUEST);
+
+                    Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                    galleryIntent.setType("image/*");
+                    startActivityForResult(galleryIntent, GALLERY_REQUEST);
+
             }
         });
 
@@ -134,7 +135,7 @@ public class ShowInformationItem extends AppCompatActivity {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                             Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                            DatabaseReference newItem = mDatabase;
+                            DatabaseReference newItem = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("items").push();
                             newItem.child("Barcode").setValue(barcode_val);
                             newItem.child("Name").setValue(name_val);
                             newItem.child("Type").setValue(type_val);
@@ -153,7 +154,7 @@ public class ShowInformationItem extends AppCompatActivity {
                     mProgress.setMessage("Adding to inventory . . .");
                     mProgress.show();
 
-                    DatabaseReference newItem = mDatabase;
+                    DatabaseReference newItem = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("items").push();
                     newItem.child("Barcode").setValue(barcode_val);
                     newItem.child("Name").setValue(name_val);
                     newItem.child("Type").setValue(type_val);
@@ -170,17 +171,17 @@ public class ShowInformationItem extends AppCompatActivity {
     }
 
 
-        @Override
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-            if(requestCode ==  GALLERY_REQUEST && resultCode == RESULT_OK){
-                imageUri = data.getData();
-                System.out.println(imageUri);
-                addImageButton6.setImageURI(imageUri);
-            }
+        if(requestCode ==  GALLERY_REQUEST && resultCode == RESULT_OK){
+            imageUri = data.getData();
+            System.out.println(imageUri);
+            addImageButton2.setImageURI(imageUri);
         }
-
-
     }
+
+
+}
 

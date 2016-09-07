@@ -98,7 +98,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
             */
             Intent intent = new Intent(ProfileActivity.this, BarcodeCaptureActivity.class);
-            intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
             startActivityForResult(intent, GET_BAR_CODE);
 
         }

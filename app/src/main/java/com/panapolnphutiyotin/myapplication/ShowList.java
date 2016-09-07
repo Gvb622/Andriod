@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +26,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
+
 import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.squareup.picasso.Picasso;
 
@@ -45,6 +48,10 @@ public class ShowList extends AppCompatActivity {
     private boolean decreaseitem;
     private boolean removeitem;
     private boolean ItemCLick ;
+    static final int GET_BAR_CODE = 1;
+    public String key;
+    public boolean finish;
+
 
 
 
@@ -60,12 +67,15 @@ public class ShowList extends AppCompatActivity {
 
 
 
+
+
         imageView = (ImageView) findViewById(R.id.imageItem);
         firebaseAuth = FirebaseAuth.getInstance();
         additem = false;
         decreaseitem = false;
         removeitem = false;
         ItemCLick = false;
+        finish = false;
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
@@ -104,7 +114,25 @@ public class ShowList extends AppCompatActivity {
                 decreaseitem = false;
                 Decreaseitem.setImageResource(R.mipmap.ic_arrow_downward_black_24dp);
 
-                startActivity(new Intent(ShowList.this, AddItemActivity.class));
+                CharSequence colors[] = new CharSequence[] {"Barcode", "Manual"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
+                builder.setTitle("Choose One");
+                builder.setItems(colors, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(which == 0){
+
+                            Intent intent = new Intent(ShowList.this, BarcodeCaptureActivity.class);
+                            startActivityForResult(intent, GET_BAR_CODE);
+
+                        }else if(which == 1){
+                            startActivity(new Intent(ShowList.this, AddItemActivity.class));
+                        }
+                    }
+                });
+                builder.show();
+
+
             }
         });
 
@@ -241,6 +269,7 @@ public class ShowList extends AppCompatActivity {
 
                             Intent i = new Intent(ShowList.this, ShowInformationItem.class);
                             i.putExtra("key",s.getKey());
+
                             startActivity(i);
 
                         }
@@ -286,5 +315,56 @@ public class ShowList extends AppCompatActivity {
         }
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GET_BAR_CODE) {
+            if (resultCode == RESULT_OK) {
+                final String barcodeValue2 = data.getStringExtra("Barcode");
+                DatabaseReference mDatabse = FirebaseDatabase.getInstance().getReference().child("system").child("items");
+                Query queryRef = mDatabse.orderByChild("Barcode").equalTo(barcodeValue2);
+                queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (final com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            final String key2 =postSnapshot.getKey();
+
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
+                            builder.setTitle("OK ?");
+                            builder.setMessage(barcodeValue2);
+                            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent i = new Intent(ShowList.this, ShowBarcode.class);
+                                    i.putExtra("key", postSnapshot.getKey());
+                                    startActivity(i);
+                                }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            builder.show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+
+            } else {
+                Toast.makeText(ShowList.this, "Barcode not Found", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

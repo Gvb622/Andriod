@@ -10,11 +10,9 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -27,12 +25,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 public class ShowList extends AppCompatActivity {
 
@@ -79,7 +74,7 @@ public class ShowList extends AppCompatActivity {
         mList.setHasFixedSize(true);
         mList.setLayoutManager(new LinearLayoutManager(this));
         mList.addItemDecoration(new SimpleListDividerDecorator(ContextCompat.getDrawable(this, R.drawable.list_divider), true));
-        //mList.setItemAnimator(new DefaultItemAnimator());
+        mList.setItemAnimator(new DefaultItemAnimator());
 
         Removeitem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,7 +170,7 @@ public class ShowList extends AppCompatActivity {
 
         mList.addOnItemTouchListener(
                 new RecyclerItemClickListener(getApplicationContext(), mList ,new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
+                    @Override public boolean onItemClick(View view, int position) {
 
                             final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
 
@@ -248,6 +243,7 @@ public class ShowList extends AppCompatActivity {
                             startActivity(i);
 
                         }
+                        return true;
 
                     }
                     @Override public void onLongItemClick(View view, int position) {

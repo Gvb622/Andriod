@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -45,6 +44,7 @@ public class ShowList extends AppCompatActivity {
     private boolean additem ;
     private boolean decreaseitem;
     private boolean removeitem;
+    private boolean ItemCLick ;
 
 
 
@@ -65,6 +65,7 @@ public class ShowList extends AppCompatActivity {
         additem = false;
         decreaseitem = false;
         removeitem = false;
+        ItemCLick = false;
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
@@ -74,7 +75,7 @@ public class ShowList extends AppCompatActivity {
         mList.setHasFixedSize(true);
         mList.setLayoutManager(new LinearLayoutManager(this));
         mList.addItemDecoration(new SimpleListDividerDecorator(ContextCompat.getDrawable(this, R.drawable.list_divider), true));
-        mList.setItemAnimator(new DefaultItemAnimator());
+        //mList.setItemAnimator(new DefaultItemAnimator());
 
         Removeitem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,7 +173,7 @@ public class ShowList extends AppCompatActivity {
                 new RecyclerItemClickListener(getApplicationContext(), mList ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public boolean onItemClick(View view, int position) {
 
-                            final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
+                        final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
 
                         if(decreaseitem == true) {
 
@@ -247,83 +248,8 @@ public class ShowList extends AppCompatActivity {
 
                     }
                     @Override public void onLongItemClick(View view, int position) {
-                        final DatabaseReference s = firebaseRecyclerAdapter.getRef(position);
 
-                        if (decreaseitem == true) {
 
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
-                            builder.setTitle("How much decrease ?");
-                            final EditText input = new EditText(ShowList.this);
-                            input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                            input.setGravity(Gravity.CENTER);
-                            builder.setView(input);
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    final String m = input.getText().toString();
-                                    final int j = Integer.parseInt(m);
-                                    s.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            item item = dataSnapshot.getValue(item.class);
-                                            int i = Integer.parseInt(item.getUnit());
-                                            i = i - j;
-                                            s.child("Unit").setValue(Integer.toString(i));
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                                }
-                            });
-                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            });
-                            builder.show();
-
-                        }else if(additem == true ){
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
-                            builder.setTitle("How much Increase ?");
-                            final EditText input = new EditText(ShowList.this);
-                            input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                            input.setGravity(Gravity.CENTER);
-                            builder.setView(input);
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    final String m = input.getText().toString();
-                                    final int j = Integer.parseInt(m);
-                                    s.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            item item = dataSnapshot.getValue(item.class);
-                                            int i = Integer.parseInt(item.getUnit());
-                                            i = i + j;
-                                            s.child("Unit").setValue(Integer.toString(i));
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                                }
-                            });
-                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            });
-                            builder.show();
-                        }
                     }
 
 
@@ -331,6 +257,7 @@ public class ShowList extends AppCompatActivity {
 
 
         );
+
 
         mList.setAdapter(firebaseRecyclerAdapter);
     }

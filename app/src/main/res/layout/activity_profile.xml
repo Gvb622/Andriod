@@ -30,7 +30,7 @@
             android:padding="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Item"
+            android:text="Barcode Detect"
             android:id="@+id/buttonLogout"
             android:layout_gravity="center_horizontal" />
 

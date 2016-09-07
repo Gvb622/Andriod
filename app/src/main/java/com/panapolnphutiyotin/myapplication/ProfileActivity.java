@@ -3,6 +3,7 @@ package com.panapolnphutiyotin.myapplication;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +22,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
+
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private Button buttonAdditem;
     private EditText editTextProductName;
     private EditText editTextBarcode;
+    static final int GET_BAR_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("items");
+
 
         if (firebaseAuth.getCurrentUser() == null) {
            // finish();
@@ -71,7 +78,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             finish();
             startActivity(new Intent(this, LoginActivity.class));
             */
-            startActivity(new Intent(this, AddItemActivity.class));
+            //startActivity(new Intent(this, AddItemActivity.class));
 
             /*sDatabase = FirebaseDatabase.getInstance().getReference().child("system").child("items");
             Query query = sDatabase.orderByChild("Barcode").equalTo("123");
@@ -88,7 +95,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                 }
             });
-*/
+
+            */
+            Intent intent = new Intent(ProfileActivity.this, BarcodeCaptureActivity.class);
+            intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
+            startActivityForResult(intent, GET_BAR_CODE);
+
         }
     }
 
@@ -121,5 +133,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             }
 
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GET_BAR_CODE) {
+            if (resultCode == RESULT_OK) {
+                String barcodeValue2 = data.getStringExtra("Barcode");
+                textViewUserEmail.setText(barcodeValue2);
+            } else {
+                textViewUserEmail.setText("No Barcode Detect");
+            }
+        }
     }
 }

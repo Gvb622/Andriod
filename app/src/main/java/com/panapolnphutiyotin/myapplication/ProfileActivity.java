@@ -74,10 +74,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             startActivity(new Intent(this, ShowList.class));
         }
         if (v == buttonLogout) {
-            /*firebaseAuth.signOut();
+            firebaseAuth.signOut();
             finish();
             startActivity(new Intent(this, LoginActivity.class));
-            */
+
             //startActivity(new Intent(this, AddItemActivity.class));
 
             /*sDatabase = FirebaseDatabase.getInstance().getReference().child("system").child("items");
@@ -97,8 +97,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             });
 
             */
-            Intent intent = new Intent(ProfileActivity.this, BarcodeCaptureActivity.class);
-            startActivityForResult(intent, GET_BAR_CODE);
+            //Intent intent = new Intent(ProfileActivity.this, BarcodeCaptureActivity.class);
+            //startActivityForResult(intent, GET_BAR_CODE);
 
         }
     }
